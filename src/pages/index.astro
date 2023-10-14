@@ -1,5 +1,12 @@
+---
+import BasicLayout from "../global/layouts/BasicLayout.astro"
+---
+
+<BasicLayout>
+    <div>Navigating...</div>
+</BasicLayout>
 
 <script>
-	let locale = navigator.languages ? navigator.languages[0] : "zh-TW"
-	window.location.href = `/${locale}`
+    let locale = navigator.languages ? navigator.languages[0] : "zh-TW"
+    window.location.href = `/${locale}`
 </script>

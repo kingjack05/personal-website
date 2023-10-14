@@ -76,6 +76,7 @@ module.exports = {
         },
     },
     plugins: [
+        require("@tailwindcss/typography"),
         function ({ addBase, addComponents, addUtilities, theme }) {
             addBase({
                 h1: { fontSize: "54px", lineHeight: "64px", fontWeight: "300" },
