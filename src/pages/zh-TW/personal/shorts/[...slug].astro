@@ -1,0 +1,26 @@
+---
+import { getCollection } from "astro:content"
+import ShortsLayout from "../../../global/layouts/ShortsLayout.astro"
+
+import type { CollectionEntry } from "astro:content"
+
+interface Props {
+    entry: CollectionEntry<"shorts">
+}
+
+export async function getStaticPaths() {
+    const shortsEntries = await getCollection("shorts")
+    return shortsEntries.map((entry) => ({
+        params: { slug: entry.slug },
+        props: { entry },
+    }))
+}
+
+const { entry } = Astro.props
+const readTime = Math.round(entry.body.length / 400) + 1
+const { Content } = await entry.render()
+---
+
+<ShortsLayout frontmatter={entry.data} readTime={readTime}>
+    <Content />
+</ShortsLayout>

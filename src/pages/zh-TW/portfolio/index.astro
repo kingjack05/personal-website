@@ -1,0 +1,52 @@
+---
+import PortfolioLayout from "../../../global/layouts/PortfolioLayout.astro"
+---
+
+<PortfolioLayout>
+    <div class="mx-auto py-4 max-w-xs lg:max-w-3xl">
+        <h1 class="text-4xl mb-8">作品集</h1>
+        <h4 class="mb-4">💻 全端開發</h4>
+        <div class="flex justify-between">
+            <a
+                href="./portfolio/questionnaire"
+                class="w-60 p-2 border border-gray-200 rounded"
+            >
+                <div class="font-semibold text-lg">醫師研究用門診問卷系統</div>
+                <div class="py-2">
+                    蒐集病人的問卷回復，並儲存於SQL資料庫，計算分數，以及進行相關統計。
+                </div>
+                <div class="flex flex-wrap mb-1">
+                    <div class="tag bg-[#a7f0ba] text-[#044317]">React</div>
+                    <div class="tag bg-[#e5e0df] text-[#3c3838] mx-1">
+                        Typescript
+                    </div>
+                    <div class="tag bg-[#e5e0df] text-[#3c3838]">Python</div>
+                </div>
+            </a>
+            <div class="w-60 p-2 border border-gray-200 rounded">
+                <div class="font-semibold text-lg">股票技術分析系統</div>
+                <div class="py-2">
+                    利用爬蟲抓取每日的股市資料，進行技術分析，並將結果儲存於SQL資料庫。
+                </div>
+                <div class="flex flex-wrap mb-1">
+                    <div class="tag bg-[#e5e0df] text-[#3c3838] mr-1">
+                        NodeJS
+                    </div>
+                    <div class="tag bg-[#bae6ff] text-[#003a6d] mx-1">SQL</div>
+                </div>
+            </div>
+            <div class="w-60 p-2 border border-gray-200 rounded">
+                <div class="font-semibold text-lg">接案公司網站</div>
+                <div class="py-2 h-[88px]">介紹公司服務內容的靜態網站。</div>
+                <div class="flex flex-wrap mb-1">
+                    <div class="tag bg-[#a7f0ba] text-[#044317]">Astro</div>
+                    <div class="tag bg-[#a7f0ba] text-[#044317] mx-1">
+                        Tailwind CSS
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <h4 class="my-4">UI/UX設計</h4> -->
+        <!-- <h4 class="my-4">🖼️ 平面設計</h4> -->
+    </div>
+</PortfolioLayout>

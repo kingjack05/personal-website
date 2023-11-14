@@ -37,6 +37,7 @@ module.exports = {
             },
             fontFamily: {
                 sans: [
+                    "Taipei Sans TC",
                     "GenSekiGothic",
                     "Libertinus Sans",
                     "ui-sans-serif",
@@ -92,6 +93,13 @@ module.exports = {
                     color: "white",
                     border: "0",
                     padding: ".5rem 1rem",
+                },
+                ".tag": {
+                    fontSize: "12px",
+                    padding: "0 8px",
+                    height: "18px",
+                    lineHeight: "18px",
+                    borderRadius: "9px",
                 },
             })
             addUtilities({})
