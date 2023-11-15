@@ -1,5 +1,573 @@
 ---
 import PortfolioLayout from "../../../global/layouts/PortfolioLayout.astro"
+import { Code } from "astro:components"
 ---
 
-<PortfolioLayout>Questionnaire</PortfolioLayout>
+<PortfolioLayout>
+    <div class="mx-auto py-4 max-w-xs lg:max-w-3xl prose">
+        <h1 class="text-3xl mb-4">醫師研究用門診問卷系統</h1>
+        <a
+            href="https://github.com/kingjack05/dr-chen-questionnaire"
+            class="flex items-center"
+            ><svg
+                class="w-4 h-4"
+                viewBox="0 0 98 96"
+                width="98"
+                height="96"
+                xmlns="http://www.w3.org/2000/svg"
+                ><path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
+                    fill="#24292f"></path></svg
+            >
+            <div class="ml-2">Github連結</div></a
+        >
+        <h2 class="text-2xl">專案介紹</h2>
+        <p>
+            案主陳醫師所進行的醫學研究需要病人填答問卷並計算問卷分數做為資料。原本的流程是由助理用
+            Google 表單做問卷，將問卷回復用 Google 表單蒐集後將回復貼到 Excel
+            裡，再透過一系列 Excel
+            公式將填答的回覆轉換成分數。由於此流程仍相當耗費人工且無法填答完成後立即看到分數，因此案主希望能替他完成一套客製化的系統，使得病人填完問卷後，後台能立刻看到分數，並且這個流程都是由程式自動完成，無須人工介入。此外，由於需要管理每個病人的一些相關照片和影片，因此也追加了檔案管理的功能。
+        </p>
+        <h2 class="text-2xl">技術重點</h2>
+        <h3 class="text-xl">
+            1. CRUD實現: <span class="text-base"
+                >PostgreSQL → Drizzle ORM → TRPC Server → Astro API → TRPC React
+                Query Client</span
+            >
+        </h3>
+        <h4 class="text-lg mt-2 underline">Drizzle ORM</h4>
+        <p>
+            <a href="https://orm.drizzle.team/" class="text-blue-300"
+                >Drizzle ORM</a
+            >是一款 Typescript 的 ORM。透過定義 schema，Drizzle ORM
+            就能幫我們生成 SQL 的 Table Migrations，並且之後 Query
+            資料的時候都會有 type safety。
+        </p>
+        <p class="my-2">Schema的定義:</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                patient/schema.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import {pgTable,integer,text,date,timestamp,index,json} from "drizzle-orm/pg-core"
+
+    export const patient = pgTable(
+    "patient",
+    {
+        id: integer("id").primaryKey(),
+        name: text("name").notNull(),
+        gender: text("gender", { enum: genderEnum }),
+        birthday: date("birthday", { mode: "date" }).notNull(),
+        diagnoses: text("diagnoses", { enum: diagnosisEnum }).array(),
+        followingQuestionnaires: text("followingQuestionnaires", {
+            enum: questionnaireEnum,
+        }).array(),
+        files: json("files").$type<FileData>().array(),
+        lastEdited: timestamp("lastEdited").defaultNow(),
+    },
+    (table) => {
+        return {
+            nameIdx: index("nameIdx").on(table.name),
+            lastEditedIdx: index("lastEditedIdx").on(table.lastEdited),
+        }
+    })
+    `}
+            />
+        </div>
+        <p class="my-2">
+            接著使用 Database Client 和 Schema 初始化 Drizzle
+            ORM。本案件資料庫選擇的是 supabase 提供的雲端 PostgreSQL 服務。
+        </p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                db.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { drizzle } from "drizzle-orm/postgres-js"
+    import postgres from "postgres"
+    import * as schema from "./schemaIndex"
+    
+    const DATABASE_URL = process.env.DATABASE_URL
+    
+    const client = postgres(DATABASE_URL)
+    
+    export const db = drizzle(client, { schema })
+        `}
+            />
+        </div>
+
+        <h4 class="text-lg mt-2 underline">TRPC Server</h4>
+        <p>
+            <a href="https://trpc.io/" class="text-blue-300">TRPC</a>是一款提供
+            end to end type safety 的 API/RPC 全端框架。不同於傳統 rest
+            API，TRPC透過在router上定義一個個 procedure 決定 client
+            可以進行的操作(API)。而 procedure 的回傳資料型態(type)會直接反應在
+            client 上，因此可以減少仰賴 API Documentation 的需求。
+        </p>
+        <p class="my-2">
+            初始化 TRPC Server。可在此定義共同的 context 或 middleware
+            (例如實踐確認身分 authentication 和授權 authorization 等功能)
+        </p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                trpcInstance.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { initTRPC, TRPCError } from "@trpc/server"
+    import superjson from "superjson"
+    import { z, ZodError } from "zod"
+
+    export const t = initTRPC.context<Context>().create({
+        transformer: superjson,
+        errorFormatter({ shape, error }) {
+            return {
+                ...shape,
+                data: {
+                    ...shape.data,
+                    zodError:
+                        error.cause instanceof ZodError
+                            ? error.cause.flatten()
+                            : null,
+                },
+            }
+        },
+    })
+
+    export const createTRPCRouter = t.router
+
+    export const publicProcedure = t.procedure
+        `}
+            />
+        </div>
+        <p class="my-2">Router 和 Procedure 的實作</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                trpcInstance.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { z } from "zod"
+    import { db } from "../db"
+    import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpcInstance"
+    export const patientRouter = createTRPCRouter({
+        patientById: publicProcedure.input(z.number()).query(async (req) => {
+            const result = await db.query.patient.findFirst({
+                where: (patient, { eq }) => eq(patient.id, req.input),
+            })
+            return result
+        }),
+        getPatientsIdAndName: adminProcedure.query(async () => {
+            const patients = await db.query.patient.findMany({
+                columns: {
+                    id: true,
+                    name: true,
+                },
+            })
+            return patients
+        })})
+        `}
+            />
+        </div>
+        <h4 class="text-lg mt-2 underline">Astro API</h4>
+        <p>
+            <a href="https://astro.build/" class="text-blue-300">Astro</a>
+             是一款類似於 NextJS、NuxtJS 等 meta-framework 的框架，可支援各種
+            javascript 框架的 server side rendering。此外，他也支援佈署 server
+            endpoint，可以當作 serverless backend 使用。
+        </p>
+        <p class="my-2">透過 Astro API 佈署 TRPC Server</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                pages/api/trpc/[trpc].ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
+    import { appRouter } from "../../../server/routerIndex"
+    import { createTRPCContext } from "../../../server/trpcInstance"
+    import type { APIRoute } from "astro"
+        
+    export const prerender = false
+        
+    export const ALL: APIRoute = ({ request }) => {
+        return fetchRequestHandler({
+            endpoint: "/api/trpc",
+            req: request,
+            router: appRouter,
+            createContext: createTRPCContext,
+            onError({ error }) {
+                if (import.meta.env.DEV && error.code === "INTERNAL_SERVER_ERROR") {
+                    throw error
+                }
+            },
+        })}
+        `}
+            />
+        </div>
+        <p class="my-2">
+            搭配的 Astro 設定。本案件使用 Vercel 佈署，因此搭配其 adapter
+        </p>
+        <div class="relative">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                astro.config.mjs
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { defineConfig } from "astro/config"
+    import react from "@astrojs/react"
+    import tailwind from "@astrojs/tailwind"
+
+    import vercel from "@astrojs/vercel/serverless"
+
+    export default defineConfig({
+        integrations: [react(), tailwind()],
+        output: "hybrid",
+        adapter: vercel(),
+    })
+        `}
+            />
+        </div>
+        <h4 class="text-lg mt-2 underline">TRPC React Query Client</h4>
+        <p>
+            <a href="https://tanstack.com/query/latest/" class="text-blue-300"
+                >React Query</a
+            > 是一個能夠簡化react的data
+            fetching的library，讓管理載入狀態(loading
+            state)、重新抓取資料(refetching)等操作變方便。TRPC內建和 React Query
+            整合的方式。
+        </p>
+        <p>初始化 TRPC react client，並傳入 router 的資料型態</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                trpc.tsx
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { createTRPCReact } from "@trpc/react-query"
+    import type { AppRouter } from "../server/routerIndex"
+
+    export const trpc = createTRPCReact<AppRouter>()
+            `}
+            />
+        </div>
+
+        <p>
+            初始化 TRPC react query client，並透過 context provider 提供給下游的
+            component
+        </p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                trpc.tsx
+            </div>
+            <Code
+                lang={"tsx"}
+                theme={"github-dark"}
+                code={`
+    import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+    import { TRPCClientError, httpBatchLink } from "@trpc/client"
+    import { useState } from "react"
+    import { trpc } from "../trpc"
+    import superjson from "superjson"
+    import type { AppRouter } from "../../server/routerIndex"
+
+    export const QueryContextProvider = ({ children }) => {
+    const [queryClient] = useState(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        onError: (error) => {
+                            const { message } = error as queryError
+                            if (message === "UNAUTHORIZED") {
+                                window.location.href = "/adminLogin"
+                            }
+                        },
+                    }}}))
+
+    const [trpcClient] = useState(() =>
+        trpc.createClient({
+            transformer: superjson,
+            links: [
+                httpBatchLink({
+                    url: "/api/trpc",
+                    async headers() {
+                        const token = localStorage.getItem("token")
+                        if (token) {
+                            return { authorization: token }
+                        }
+                        return {}
+                    },
+                }),
+            ]}))
+    
+    return (
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+                {children}
+            </QueryClientProvider>
+        </trpc.Provider>
+    )}
+            `}
+            />
+        </div>
+        <p>在 React Component 中使用</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                test.tsx
+            </div>
+            <Code
+                lang={"tsx"}
+                theme={"github-dark"}
+                code={`
+    import { QueryContextProvider } from "../components/Providers/QueryContext"
+    import { trpc } from "../components/trpc"
+
+    const Test = () => {
+        const filesQuery = trpc.diagnosisData.test.useQuery()
+        const files = filesQuery.data
+        return <>{JSON.stringify(files)}</>
+    }
+
+    export const TestPage = () => {
+        return (
+            <QueryContextProvider>
+                <Test />
+            </QueryContextProvider>
+        )
+    }
+            `}
+            />
+        </div>
+        <h3 class="text-xl">2. 串接 Amazon S3 API</h3>
+        <p>初始化 S3 Client</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                s3Instance.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { S3Client } from "@aws-sdk/client-s3"
+
+    export const s3 = new S3Client({
+        endpoint: "https://s3.us-west-004.backblazeb2.com",
+        region: "us-west-004",
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+    })
+            `}
+            />
+        </div>
+        <p>儲存在 TRPC 的 Context 裡</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                trpcInstance.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { s3 } from "./s3Instance"
+
+    const createInnerTRPCContext = (opts: CreateContextOptions) => {
+        return { ...opts, s3 }
+    }
+            `}
+            />
+        </div>
+        <p>在 TRPC Router 中實作</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                patient/router.ts
+            </div>
+            <Code
+                lang={"ts"}
+                theme={"github-dark"}
+                code={`
+    import { ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3"
+
+    export const patientRouter = createTRPCRouter({
+        getFiles: adminProcedure.query(async ({ ctx }) => {
+            const { s3 } = ctx
+            const command = new ListObjectsV2Command({ Bucket: "reason" })
+            let listObjectsOutput
+            try {
+                listObjectsOutput = await s3.send(command)
+            } catch (error) {
+                console.log(error)
+            }
+
+            return listObjectsOutput?.Contents ?? []
+        }),
+        getStandardUploadPresignedUrl: adminProcedure
+            .input(z.object({ key: z.string() }))
+            .mutation(async ({ ctx, input }) => {
+                const { key } = input
+                const { s3 } = ctx
+
+                const putObjectCommand = new PutObjectCommand({
+                    Bucket: "reason",
+                    Key: key,
+                })
+
+                return await getSignedUrl(s3, putObjectCommand)
+            }),
+    })
+            `}
+            />
+        </div>
+        <h3 class="text-xl">3. 串接 Python 資料處理後端</h3>
+        <p>
+            由於本專案有進行統計/數據分析的需求，然而 Javascript
+            的資料處理生態系較不完善，因此本專案使用 Gradio 實作一個微型的
+            Python 後端以處理統計的需求。
+        </p>
+        <p>
+            <a href="https://www.gradio.app/" class="text-blue-300">Gradio</a>
+             是一個能夠幫助你快速建立可互動的 Data Science Demo
+            並分享給他人的工具。除了產生可互動的 UI 以外，它也會產生 API
+            供其他程式碼使用。
+        </p>
+        <p>Gradio 後端實作。本專案使用 statsmodels 來處理線性回歸。</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                app.py
+            </div>
+            <Code
+                lang={"python"}
+                theme={"github-dark"}
+                code={`
+    import gradio as gr
+    import pandas as pd
+    import numpy as np
+    import statsmodels.api as sm
+    import json
+
+    def lr(data):
+        df = data.astype(float)
+        endo = df.iloc[:,-1:].to_numpy()
+        exo = df.iloc[:,:-1].to_numpy()
+        X = sm.add_constant(exo)
+        mod = sm.OLS(endo, X)
+        results = mod.fit()
+        results_as_html = results.summary().tables[1].as_html()
+        mean = df.mean()
+        std = df.std()
+        result = {'r': results.rsquared, 'mean':mean.to_dict(), 'std':std.to_dict(), 
+            'table1':pd.read_html(results_as_html, header=0, 
+            index_col=0)[0].to_json(), 'full':results.summary().as_text()}
+        resultJson = json.dumps(result)
+        
+        return resultJson
+
+    iface = gr.Interface(fn=lr, inputs="dataframe", outputs="text")
+
+    iface.launch()
+            `}
+            />
+        </div>
+        <p>透過 Gradio Client 使用 Gradio 的 API</p>
+        <div class="relative mb-8">
+            <div
+                class="absolute text-white px-2 bg-slate-700 rounded-b text-sm"
+            >
+                StatisticalAnalysisPanel.jsx
+            </div>
+            <Code
+                lang={"jsx"}
+                theme={"github-dark"}
+                code={`
+    import { client } from "@gradio/client"
+
+    const onSubmitData = async () => {
+        const app = await client(
+            "https://kingjack05-linearregression.hf.space/--replicas/88ps6/",
+        )
+
+        let rowData = []
+        api.forEachNodeAfterFilter((node) =>
+            rowData.push(node.data),
+        )
+        const data = rowData.map((row) =>
+            visibleColNames.map((col) => row[col]),
+        )
+
+        try {
+            const result = await app.predict("/predict", [
+                {
+                    headers: visibleColNames, 
+                    data, 
+                },
+            ])
+            const parsedResult = JSON.parse(result.data)
+            const parsedTable1 = JSON.parse(parsedResult.table1)
+            setR(parsedResult.r)
+            setResults(
+                visibleColNames.map((col, index) => ({
+                    col,
+                    avg: parsedResult.mean[col],
+                    std: parsedResult.std[col],
+                    coef: Object.values(parsedTable1.coef)[
+                        index + 1
+                    ],
+                    p: Object.values(parsedTable1["P>|t|"])[
+                        index + 1
+                    ],
+                }))
+            )
+        } catch (error) {
+            console.log(error)
+        }
+            `}
+            />
+        </div>
+    </div>
+</PortfolioLayout>
