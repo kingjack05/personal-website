@@ -1,6 +1,6 @@
 ---
 title: Hello
-tags: test
+tags: [test]
 ---
 
 Hello!
