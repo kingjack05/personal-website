@@ -1,12 +1,13 @@
 ---
 import PortfolioLayout from "../../../global/layouts/PortfolioLayout.astro"
+import Modal from "../../../components/Astro/Modal.astro"
 ---
 
 <PortfolioLayout>
     <div class="mx-auto py-4 max-w-xs lg:max-w-3xl">
         <h1 class="text-4xl mb-8">作品集</h1>
         <h4 class="mb-4">💻 全端開發</h4>
-        <div class="flex justify-between">
+        <div class="flex justify-between flex-wrap">
             <a
                 href="./portfolio/questionnaire"
                 class="w-60 p-2 border border-gray-200 rounded"
@@ -47,6 +48,92 @@ import PortfolioLayout from "../../../global/layouts/PortfolioLayout.astro"
             </div>
         </div>
         <!-- <h4 class="my-4">UI/UX設計</h4> -->
-        <!-- <h4 class="my-4">🖼️ 平面設計</h4> -->
+        <h4 class="my-4">🖼️ 平面設計</h4>
+        <div class="flex justify-between flex-wrap">
+            <Modal id="branding">
+                <div
+                    slot="open"
+                    class="w-60 p-2 border border-gray-200 rounded"
+                >
+                    <img src="/branding/16.png" class="rounded-sm h-32" />
+                    <div class="font-semibold text-lg text-left pt-1">
+                        旅遊品牌設計練習
+                    </div>
+                </div>
+                <main slot="main" class="container">
+                    <img src="/branding/01.png" />
+                    <img src="/branding/02.png" />
+                    <img src="/branding/03.png" />
+                    <img src="/branding/04.png" />
+                    <img src="/branding/05.png" />
+                    <img src="/branding/06.png" />
+                    <img src="/branding/07.png" />
+                    <img src="/branding/08.png" />
+                    <img src="/branding/09.png" />
+                    <img src="/branding/10.png" />
+                    <img src="/branding/11.png" />
+                    <img src="/branding/12.png" />
+                    <img src="/branding/13.png" />
+                    <img src="/branding/14.png" />
+                    <img src="/branding/15.png" />
+                    <img src="/branding/16.png" />
+                    <img src="/branding/17.png" />
+                    <img src="/branding/18.png" />
+                    <img src="/branding/19.png" />
+                    <img src="/branding/20.png" />
+                    <img src="/branding/21.png" />
+                    <img src="/branding/22.png" />
+                    <img src="/branding/23.png" />
+                    <img src="/branding/24.png" />
+                </main>
+            </Modal>
+            <Modal id="poster">
+                <div
+                    slot="open"
+                    class="w-60 p-2 border border-gray-200 rounded"
+                >
+                    <img src="/poster/01_cropped.jpg" class="rounded-sm h-32" />
+                    <div class="font-semibold text-lg text-left pt-1">
+                        海報練習
+                    </div>
+                </div>
+                <main
+                    slot="main"
+                    class="flex flex-wrap container items-center justify-center"
+                >
+                    <img src="/poster/01.jpg" class="w-64" />
+                    <img src="/poster/02.png" class="w-64" />
+                </main>
+            </Modal>
+            <Modal id="albumCover">
+                <div
+                    slot="open"
+                    class="w-60 p-2 border border-gray-200 rounded"
+                >
+                    <img
+                        src="/albumCover/01_cropped.png"
+                        class="rounded-sm h-32"
+                    />
+                    <div class="font-semibold text-lg text-left pt-1">
+                        單曲封面練習
+                    </div>
+                </div>
+                <main
+                    slot="main"
+                    class="flex flex-wrap container items-center justify-center"
+                >
+                    <a
+                        href="https://www.youtube.com/watch?v=gI2eO_mNM88"
+                        target="_blank"
+                        ><img src="/albumCover/01.png" class="w-64" /></a
+                    >
+                    <a
+                        href="https://www.youtube.com/watch?v=Km71Rr9K-Bw"
+                        target="_blank"
+                        ><img src="/albumCover/02.png" class="w-64" /></a
+                    >
+                </main>
+            </Modal>
+        </div>
     </div>
 </PortfolioLayout>
