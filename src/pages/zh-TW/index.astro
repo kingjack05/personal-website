@@ -1,5 +1,96 @@
 ---
-import BasicLayout from "../../global/layouts/BasicLayout.astro"
+import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
 ---
 
-<BasicLayout />
+<style>
+    .active {
+        text-decoration: underline;
+        /* color: black; */
+    }
+</style>
+
+<PortfolioLayout className="px-2 bg-[#f4f4f3]">
+    <header></header>
+    <main class="">
+        <div class="flex bg-[#f4f4f3] min-h-screen">
+            <div class="ml-20 flex-grow">
+                <div class="text-black/40 my-16">
+                    <a href="#Inventors">Inventors</a>,
+                    <a href="#Creators">Creators</a>,
+                    <a href="#Entrepreneurs">Entrepreneurs</a>: <span
+                        class="text-sm">Starry Eyed Dreamers</span
+                    >
+                </div>
+                <div class="carousel">
+                    <div id="Inventors" class="w-full shrink-0">
+                        <h1 class="text-3xl">為你的點子賦予形狀</h1>
+                        <ul class="text-black/60 mt-12">
+                            <li class="my-2">
+                                數位產品雛型開發 High Fidelity Prototype
+                            </li>
+                            <li class="my-2">微型軟體服務 Micro SaaS</li>
+                            <li class="my-2">
+                                個人生產力系統 Personal Productivity System
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="Creators" class="w-full shrink-0">
+                        <h1 class="text-3xl">量身打造視覺風格</h1>
+                        <ul class="text-black/60 mt-12">
+                            <li class="my-2">個人作品集 Personal Portfolio</li>
+                            <li class="my-2">粉絲互動 Fan Connection</li>
+                            <li class="my-2">數位行銷 Digital Marketing</li>
+                        </ul>
+                    </div>
+                    <div id="Entrepreneurs" class="w-full shrink-0">
+                        <h1 class="text-3xl">量身打造視覺風格</h1>
+                        <ul class="text-black/60 mt-12">
+                            <li class="my-2">
+                                企業形象網站 Consumer-Facing Website
+                            </li>
+                            <li class="my-2">電商網站 E-Commerce</li>
+                            <li class="my-2">
+                                企業後臺網站 Enterprise Management System
+                            </li>
+                            <li class="my-2">數位行銷 Digital Marketing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mr-20">
+                <img
+                    class="w-96 animate-fadeIn"
+                    src="/mainVisual.png"
+                    alt="Sun In Hand"
+                />
+            </div>
+        </div>
+    </main>
+    <footer></footer>
+</PortfolioLayout>
+
+<script>
+    const slides = document.querySelectorAll(".carousel div")
+    if (!slides.length) throw new Error("No slides found")
+
+    let options = {
+        root: document.querySelector(".carousel"),
+        rootMargin: "0px 0px 0px 0px",
+        threshold: 0.99,
+    }
+    const intersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            const link = document.querySelector(`a[href="#${entry.target.id}"]`)
+
+            if (!link) return
+            // console.log(entry)
+            // carousel item somehow larger than carousel container when using flex
+            if (entry.intersectionRatio > 0.99) {
+                link.classList.add("active")
+            } else {
+                link.classList.remove("active")
+            }
+        })
+    }, options)
+    slides.forEach((slide) => intersectionObserver.observe(slide))
+</script>

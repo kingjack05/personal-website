@@ -70,9 +70,18 @@ module.exports = {
                             "0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fdaf8f",
                     },
                 },
+                fadeIn: {
+                    from: {
+                        opacity: "0",
+                    },
+                    to: {
+                        opacity: "1",
+                    },
+                },
             },
             animation: {
                 glow: "glow 1s ease-in-out infinite alternate",
+                fadeIn: "fadeIn 6s ease-in-out",
             },
         },
     },
@@ -100,6 +109,17 @@ module.exports = {
                     height: "18px",
                     lineHeight: "18px",
                     borderRadius: "9px",
+                },
+                ".carousel": {
+                    display: "inline-flex",
+                    "overflow-x": "scroll",
+                    "scroll-snap-type": "x mandatory",
+                    "scroll-behavior": "smooth",
+                    "-ms-overflow-style": "none",
+                    "scrollbar-width": "none",
+                    "&::-webkit-scrollbar": {
+                        display: "none",
+                    },
                 },
             })
             addUtilities({})
