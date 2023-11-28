@@ -9,19 +9,31 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
     }
 </style>
 
-<PortfolioLayout className="px-2 bg-[#f4f4f3]">
-    <header></header>
+<PortfolioLayout title="旦晨工作室" className="px-2 bg-[#f4f4f3]">
+    <header>
+        <nav
+            class="fixed bg-white w-full z-10 h-12 flex justify-center items-center"
+        >
+            <div class="flex-grow"></div>
+            <ul class="flex mr-28">
+                <li class="mx-4">About</li>
+                <li class="mx-4">Services</li>
+                <li class="mx-4">Projects</li>
+                <li class="mx-4">Contact</li>
+            </ul>
+        </nav>
+    </header>
     <main class="">
         <div class="flex bg-[#f4f4f3] min-h-screen">
             <div class="ml-20 flex-grow">
-                <div class="text-black/40 my-16">
-                    <a href="#Inventors">Inventors</a>,
-                    <a href="#Creators">Creators</a>,
-                    <a href="#Entrepreneurs">Entrepreneurs</a>: <span
-                        class="text-sm">Starry Eyed Dreamers</span
-                    >
+                <div class="text-black/40 mt-28 mb-16">
+                    <a href="#Inventors" class="slideAnchor">Inventors</a>,
+                    <a href="#Creators" class="slideAnchor">Creators</a>,
+                    <a href="#Entrepreneurs" class="slideAnchor"
+                        >Entrepreneurs</a
+                    >: <span class="text-sm">Starry Eyed Dreamers</span>
                 </div>
-                <div class="carousel">
+                <div class="carousel relative">
                     <div id="Inventors" class="w-full shrink-0">
                         <h1 class="text-3xl">為你的點子賦予形狀</h1>
                         <ul class="text-black/60 mt-12">
@@ -43,7 +55,7 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
                         </ul>
                     </div>
                     <div id="Entrepreneurs" class="w-full shrink-0">
-                        <h1 class="text-3xl">量身打造視覺風格</h1>
+                        <h1 class="text-3xl">提升企業數位創新力</h1>
                         <ul class="text-black/60 mt-12">
                             <li class="my-2">
                                 企業形象網站 Consumer-Facing Website
@@ -57,14 +69,22 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
                     </div>
                 </div>
             </div>
-            <div class="mr-20">
+            <div class="mr-20 flex-shrink-0">
                 <img
                     class="w-96 animate-fadeIn"
                     src="/mainVisual.png"
                     alt="Sun In Hand"
                 />
+                <div class="text-sm text-black/30 ml-16">
+                    Photo Credit <a
+                        href="https://unsplash.com/photos/silhouette-of-man-standing-on-seashore-during-sunset-WPnUcMDj-6M"
+                        class="underline">Ashraful Haque Akash</a
+                    >
+                </div>
             </div>
         </div>
+        <div class="h-96">服務項目 Services</div>
+        <div>作品集 Projects</div>
     </main>
     <footer></footer>
 </PortfolioLayout>
@@ -73,24 +93,119 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
     const slides = document.querySelectorAll(".carousel div")
     if (!slides.length) throw new Error("No slides found")
 
-    let options = {
-        root: document.querySelector(".carousel"),
-        rootMargin: "0px 0px 0px 0px",
-        threshold: 0.99,
-    }
-    const intersectionObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            const link = document.querySelector(`a[href="#${entry.target.id}"]`)
+    const slideIntersectionObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                const link = document.querySelector(
+                    `a[href="#${entry.target.id}"]`,
+                )
 
-            if (!link) return
-            // console.log(entry)
-            // carousel item somehow larger than carousel container when using flex
-            if (entry.intersectionRatio > 0.99) {
-                link.classList.add("active")
-            } else {
-                link.classList.remove("active")
+                if (!link) return
+                // console.log(entry)
+                // carousel item somehow larger than carousel container when using flex
+                if (entry.intersectionRatio > 0.99) {
+                    link.classList.add("active")
+                } else {
+                    link.classList.remove("active")
+                }
+            })
+        },
+        {
+            root: document.querySelector(".carousel"),
+            rootMargin: "0px 0px 0px 0px",
+            threshold: 0.99,
+        },
+    )
+    slides.forEach((slide) => slideIntersectionObserver.observe(slide))
+
+    // have to scroll manually otherwise snaps to the top
+    // https://github.com/saadeghi/daisyui/issues/413
+    const goTo = (event: Event) => {
+        event.preventDefault()
+        const btn = event.currentTarget! as HTMLElement
+
+        const carousel = document.querySelector(".carousel")!
+
+        const href = btn.getAttribute("href")!
+        const target = carousel.querySelector<HTMLDivElement>(href)!
+        const left = target.offsetLeft
+        console.log(left, target)
+        carousel.scrollTo({ left: left })
+    }
+    const slideAnchors = document.querySelectorAll(".slideAnchor")
+    slideAnchors.forEach((elem) => {
+        elem.addEventListener("click", goTo)
+    })
+
+    function throttle(fn: any, delay = 500) {
+        let timer: NodeJS.Timeout | null = null
+
+        // throttle 本身會回傳一個函式，透過 ...args 拿到該函式的引數
+        return (...args: any) => {
+            // 如果有計時器，表示還在 delay 的秒數內
+            // 直接 return，不往下執行程式碼
+            if (timer) return
+
+            // 如果計時器不等於 null，會進到以下邏輯
+
+            // 設定計時器，在 delay 秒數之後，會執行回調函式 fn，並將計時器值為改為 null
+            // 如果還不到 delay 的秒數，則 timer 的值不為 null，不會進到這段邏輯
+            // 可以達到 throttle 的目的，將一段時間內的操作，集合成一次執行
+            timer = setTimeout(() => {
+                fn(...args)
+                timer = null
+            }, delay)
+        }
+    }
+
+    const nav = document.querySelector("nav")
+    if (!nav) throw new Error("No nav found")
+
+    let previousScrollPosition = 0
+    const fadeOut = nav.animate([{ transform: "translateY(-100%)" }], {
+        duration: 1200,
+        iterations: 1,
+        fill: "forwards",
+        id: "fadeOut",
+        easing: "ease-in-out",
+    })
+    fadeOut.pause()
+    fadeOut.persist()
+    const handleScroll = () => {
+        const scrollPosition = window.scrollY
+        // const curAnimations = nav.getAnimations()
+        // console.log(nav, curAnimations)
+
+        if (scrollPosition > previousScrollPosition) {
+            if (scrollPosition < nav.clientHeight) return
+            if (
+                fadeOut.playbackRate == 1 &&
+                (fadeOut.playState == "running" ||
+                    fadeOut.playState == "finished")
+            ) {
+                return
             }
-        })
-    }, options)
-    slides.forEach((slide) => intersectionObserver.observe(slide))
+
+            fadeOut.playbackRate = 1
+            fadeOut.play()
+            fadeOut.persist()
+
+            previousScrollPosition = scrollPosition
+        } else {
+            if (
+                fadeOut.playbackRate == -1 &&
+                (fadeOut.playState == "running" ||
+                    fadeOut.playState == "finished")
+            ) {
+                return
+            }
+
+            fadeOut.playbackRate = -1
+            fadeOut.play()
+            fadeOut.persist()
+
+            previousScrollPosition = scrollPosition
+        }
+    }
+    window.addEventListener("scroll", throttle(handleScroll))
 </script>
