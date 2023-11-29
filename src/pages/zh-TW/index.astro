@@ -9,17 +9,19 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
     }
 </style>
 
-<PortfolioLayout title="旦晨工作室" className="px-2 bg-[#f4f4f3]">
+<PortfolioLayout title="旦晨工作室" className="bg-[#f4f4f3]">
     <header>
         <nav
             class="fixed bg-white w-full z-10 h-12 flex justify-center items-center"
         >
             <div class="flex-grow"></div>
             <ul class="flex mr-28">
-                <li class="mx-4">About</li>
-                <li class="mx-4">Services</li>
-                <li class="mx-4">Projects</li>
-                <li class="mx-4">Contact</li>
+                <li class="mx-4">
+                    <a href="/">About</a>
+                </li>
+                <li class="mx-4"><a href="#Services">Services</a></li>
+                <li class="mx-4"><a href="#Projects">Projects</a></li>
+                <li class="mx-4"><a href="#Contact">Contact</a></li>
             </ul>
         </nav>
     </header>
@@ -75,18 +77,115 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
                     src="/mainVisual.png"
                     alt="Sun In Hand"
                 />
-                <div class="text-sm text-black/30 ml-16">
-                    Photo Credit <a
-                        href="https://unsplash.com/photos/silhouette-of-man-standing-on-seashore-during-sunset-WPnUcMDj-6M"
-                        class="underline">Ashraful Haque Akash</a
-                    >
+                <div class="text-sm text-black/30 ml-4 text-center">
+                    <div class="py-1">Made With Adobe Photoshop</div>
+                    <div>
+                        Photo Credit <a
+                            href="https://unsplash.com/photos/silhouette-of-man-standing-on-seashore-during-sunset-WPnUcMDj-6M"
+                            class="underline">Ashraful Haque Akash</a
+                        >
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="h-96">服務項目 Services</div>
-        <div>作品集 Projects</div>
+        <div class="ml-20">
+            <h1 class="text-2xl" id="Services">服務項目 Services</h1>
+            <div>
+                <div>
+                    <div class="text-lg mt-2">靜態網頁</div>
+                    <div class="text-sm text-black/40">
+                        一頁式網站，活動網站，商家官網，個人作品集網站...
+                    </div>
+                    <div class="text-sm text-black/40">$3000 起</div>
+                </div>
+                <div>
+                    <div class="mt-2 text-lg">動態網站</div>
+                    <div class="text-sm text-black/40">
+                        電商網站，會員網站，企業後臺管理網站...
+                    </div>
+                    <div class="text-sm text-black/40">$15000 起</div>
+                </div>
+                <div>
+                    <div class="text-lg mt-2">平面設計</div>
+                    <div class="text-sm text-black/40">
+                        名片設計，海報設計，網頁設計，品牌 Logo，品牌視覺形象...
+                    </div>
+                    <div class="text-sm text-black/40">$1500 起</div>
+                </div>
+            </div>
+        </div>
+        <div class="ml-20 mt-12">
+            <h1 class="text-2xl" id="Projects">作品集 Projects</h1>
+            <div class="border-l-4 pl-4 my-4 flex">
+                <img src="/personal.png" class="w-80" />
+                <div class="ml-4">
+                    <div class="text-lg mb-2">個人網站</div>
+                    <div>我的個人網站，用來存放寫的東西</div>
+                </div>
+            </div>
+            <div class="border-l-4 pl-4 my-4 flex">
+                <img src="/questionnaireProject.png" class="w-80" />
+                <div class="ml-4">
+                    <div class="text-lg mb-2">醫師問卷系統</div>
+                    <div>計算病人填答問卷分數並立刻存入資料庫的系統</div>
+                </div>
+            </div>
+        </div>
+        <div class="ml-20 mt-12">
+            <h1 class="text-2xl mb-4" id="Contact">聯繫 Contact</h1>
+            <form id="ContactForm">
+                <input
+                    class="input bg-transparent w-24"
+                    type="text"
+                    name="name"
+                    placeholder="姓名"
+                    required
+                />
+                <input
+                    class="input bg-transparent ml-12 w-60"
+                    type="email"
+                    name="mail"
+                    placeholder="信箱"
+                    required
+                />
+                <input
+                    class="input bg-transparent block my-4 w-96"
+                    type="text"
+                    name="item"
+                    placeholder="想要詢問的項目"
+                    required
+                />
+                <textarea
+                    name="info"
+                    class="input bg-transparent mb-4 w-96 h-40"
+                    placeholder="其他想補充的"></textarea>
+                <button
+                    type="submit"
+                    class="rounded bg-transparent border block p-2 text-black/60 hover:text-black hover:shadow"
+                    >送出</button
+                >
+                <div id="submitResultMsg" class="my-4 invisible">
+                    很高興能與您合作，我們將儘快進一步與您聯絡。
+                </div>
+            </form>
+        </div>
     </main>
-    <footer></footer>
+    <footer class="w-full flex py-2 mt-16">
+        <div class="flex-grow"></div>
+        <div class="text-sm text-black/50 mr-20 text-right">
+            <div>2023 © 水象工作室</div>
+            <div class="py-1">
+                <a href="https://facebook.com/FirstRayStudio">關於</a> /
+                <a href="https://facebook.com/FirstRayStudio">服務</a> /
+                <a href="https://facebook.com/FirstRayStudio">作品</a> /
+                <a href="https://facebook.com/FirstRayStudio">聯繫</a>
+            </div>
+            <div>
+                <a href="https://line.me/ti/p/bfLGU-WKqS">FB</a> /
+                <a href="https://facebook.com/FirstRayStudio">LINE</a>
+            </div>
+        </div>
+    </footer>
 </PortfolioLayout>
 
 <script>
@@ -208,4 +307,29 @@ import PortfolioLayout from "../../global/layouts/PortfolioLayout.astro"
         }
     }
     window.addEventListener("scroll", throttle(handleScroll))
+
+    const contactForm = document.querySelector(
+        "#ContactForm",
+    )! as HTMLFormElement
+    contactForm.addEventListener("submit", async (e) => {
+        e.preventDefault()
+        const data = new FormData(contactForm)
+        const dataObj = {} as any
+        for (const [name, value] of data) {
+            dataObj[name] = value
+        }
+        const response = await fetch("/handleContactForm", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataObj),
+        })
+        const result = await response.json()
+        if (result.message == "Success") {
+            document
+                .querySelector("#submitResultMsg")
+                ?.classList.remove("invisible")
+        }
+    })
 </script>

@@ -121,6 +121,16 @@ module.exports = {
                         display: "none",
                     },
                 },
+                ".input": {
+                    borderBottom: "1px solid #c6c6c6",
+                    "&:focus": {
+                        borderColor: "#393939",
+                        outlineWidth: "0",
+                    },
+                    "&:disabled": {
+                        borderColor: "transparent",
+                    },
+                },
             })
             addUtilities({})
         },
