@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro"
 
+export const prerender = false
+
 const BOT_TOKEN =
     import.meta.env.TELEGRAM_BOT_TOKEN ?? process.env.TELEGRAM_BOT_TOKEN
 const CHAT_ID = import.meta.env.CHAT_ID ?? process.env.CHAT_ID
